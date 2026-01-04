@@ -1,0 +1,1 @@
+Goal is to create a game engine with a focus on systems, physics, and interactivity with rust's performance and its safety features. We should relatively easily be able to create systems that are performant and functional.
