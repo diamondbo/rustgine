@@ -59,6 +59,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc7eb209b1518d6bb87b283c20095f5228ecda460da70b44f0802523dea6da04"
 
 [[package]]
+name = "app"
+version = "0.1.0"
+dependencies = [
+ "core",
+ "ecs",
+ "math",
+ "platform",
+ "render",
+ "scheduler",
+ "winit",
+]
+
+[[package]]
 name = "arrayref"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -197,6 +210,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "core"
+version = "0.1.0"
+
+[[package]]
 name = "core-foundation"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -274,6 +291,13 @@ name = "dpi"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8b14ccef22fc6f5a8f4d7d768562a182c04ce9a3b3157b91390b52ddfdf1a76"
+
+[[package]]
+name = "ecs"
+version = "0.1.0"
+dependencies = [
+ "core",
+]
 
 [[package]]
 name = "equivalent"
@@ -454,6 +478,10 @@ name = "log"
 version = "0.4.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
+
+[[package]]
+name = "math"
+version = "0.1.0"
 
 [[package]]
 name = "memchr"
@@ -788,6 +816,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7edddbd0b52d732b21ad9a5fab5c704c14cd949e5e9a1ec5929a24fded1b904c"
 
 [[package]]
+name = "platform"
+version = "0.1.0"
+dependencies = [
+ "core",
+]
+
+[[package]]
 name = "polling"
 version = "3.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -869,10 +904,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "rustgine"
+name = "render"
 version = "0.1.0"
 dependencies = [
- "winit",
+ "core",
+ "math",
 ]
 
 [[package]]
@@ -914,6 +950,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "scheduler"
+version = "0.1.0"
+dependencies = [
+ "core",
+ "ecs",
 ]
 
 [[package]]
