@@ -2,7 +2,7 @@ use winit::{
     event::{Event, WindowEvent},
     event_loop::EventLoop,
     event_loop::ActiveEventLoop,
-    window::{Window, WindowAttributes},
+    window::WindowAttributes,
 };
 fn main() {
      // Create an event loop
