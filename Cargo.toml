@@ -1,7 +1,11 @@
-[package]
-name = "rustgine"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-winit = "0.30.12"
+[workspace]
+resolver = "2"
+members = [
+    "crates/core",
+    "crates/ecs",
+    "crates/scheduler",
+    "crates/render",
+    "crates/platform",
+    "crates/math",
+    "crates/app",
+]
