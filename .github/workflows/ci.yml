@@ -109,8 +109,9 @@ jobs:
 
   tag:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
     needs: build
+    if: |
+      always() && github.event_name == 'push'
 
     steps:
     - uses: actions/checkout@v4
