@@ -9,4 +9,6 @@ members = [
     "crates/math",
     "crates/app",
 ]
-package.version = "0.1.0"
+
+[workspace.package]
+version = "0.2.0"

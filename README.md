@@ -5,6 +5,11 @@
 <p align="center">
   <i>A modern, data-oriented game engine written in Rust.</i><br><br>
 
+<!-- Version Badge - do not edit manually -->
+<a href="https://crates.io/crates/rustgine">
+    <img src="https://img.shields.io/github/v/tag/diamondbo/rustgine?label=version" alt="Version">
+</a>
+
 <!-- CI Badges -->
 
 <a href="https://github.com/diamondbo/rustgine/blob/main/LICENSE">
