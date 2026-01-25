@@ -2,13 +2,7 @@ use std::sync::Arc;
 
 #[cfg(target_arch = "wasm32")]
 use winit::event_loop::{self, EventLoopProxy};
-use winit::{
-    application::ApplicationHandler,
-    event::*,
-    event_loop::{ActiveEventLoop, EventLoop},
-    keyboard::{KeyCode, PhysicalKey},
-    window::Window,
-};
+use winit::window::Window;
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
