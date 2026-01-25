@@ -36,6 +36,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
     - name: Enforce version and changelog update
       run: |
         set -e
@@ -73,7 +76,7 @@ jobs:
         version=$(./ci/scripts/get-version.sh)
         echo "${{ env.APP_NAME }} version: $version"
         echo "### 📦 ${{ env.APP_NAME }} Version: \`$version\`" >> $GITHUB_STEP_SUMMARY
-        
+
     - name: match versions
       run: |
         chmod +x ./ci/scripts/check-version-match.sh
