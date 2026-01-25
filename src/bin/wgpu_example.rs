@@ -4,28 +4,25 @@ use std::sync::Arc;
 use winit::event_loop::{self, EventLoopProxy};
 use winit::{
     application::ApplicationHandler,
-    event::*, event_loop::{ActiveEventLoop, EventLoop},
+    event::*,
+    event_loop::{ActiveEventLoop, EventLoop},
     keyboard::{KeyCode, PhysicalKey},
-    window::Window
+    window::Window,
 };
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 pub struct State {
-    window: Arc<Window>
+    window: Arc<Window>,
 }
 
 impl State {
     pub async fn new(window: Arc<Window>) -> anyhow::Result<Self> {
-        Ok(Self {
-            window,
-        })
+        Ok(Self { window })
     }
 
-    pub fn resize(&mut self, _width: u32, _height: u32) {
-
-    }
+    pub fn resize(&mut self, _width: u32, _height: u32) {}
 
     pub fn render(&mut self) {
         self.window.request_redraw();
@@ -50,7 +47,6 @@ impl App {
     }
 }
 
-fn main()
-{
+fn main() {
     println!("added structs for state and application");
 }
