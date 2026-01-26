@@ -1,25 +1,129 @@
 name: Rust
 
-on:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on: 
   push:
     branches: [ "main" ]
+    paths:
+      - 'Cargo.toml'
+      - 'crates/**'
+      - 'Cargo.lock'
+      - '.github/workflows/ci.yml'
   pull_request:
     branches: [ "main" ]
+    types: [opened, reopened, synchronize]
+    paths:
+      - 'Cargo.toml'
+      - 'crates/**'
+      - 'Cargo.lock'
+      - '.github/workflows/ci.yml'
+
+
+permissions:
+  contents: write
 
 env:
+  APP_NAME: rustgine
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  version_check:
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Enforce version and changelog update
+      run: |
+        set -e
+
+        echo "🔍 Checking if library code has changed..."
+        if git show-ref --verify --quiet refs/remotes/origin/main; then
+          if git diff -s --exit-code origin/main -- crates Cargo.toml; then
+            echo "✅ No library changes detected. Skipping version and changelog checks."
+            exit 0
+          fi
+
+          echo "📦 Library code was changed. Checking if version was updated..."
+          if git diff origin/main -- Cargo.toml | grep -q '^\+version = '; then
+            echo "✅ Version updated in [workspace.package]."
+          else
+            echo "❌ Version NOT updated in [workspace.package]!"
+            exit 1
+          fi
+
+          echo "📝 Checking if CHANGELOG was updated..."
+          if git diff origin/main -- CHANGELOG.md | grep -q '^+## \['; then
+            echo "✅ CHANGELOG.md updated."
+          else
+            echo "❌ CHANGELOG.md NOT updated!"
+            exit 1
+          fi
+        else
+          echo "❌ Branch 'origin/main' does not exist. Make sure your CI checks out main."
+          exit 1
+        fi
+
+    - name: ${{ env.APP_NAME }} version
+      run: |
+        chmod +x ./ci/scripts/get-version.sh
+        version=$(./ci/scripts/get-version.sh)
+        echo "${{ env.APP_NAME }} version: $version"
+        echo "### 📦 ${{ env.APP_NAME }} Version: \`$version\`" >> $GITHUB_STEP_SUMMARY
+
+    - name: match versions
+      run: |
+        chmod +x ./ci/scripts/check-version-match.sh
+        ./ci/scripts/check-version-match.sh
+
+
+  build_n_test:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: version_check
 
     steps:
     - uses: actions/checkout@v4
 
+    - name: Format
+      run: |
+        cargo fmt --all --check
+
+    - name: Lint
+      run: |
+        cargo clippy --workspace --all-targets -- -D warnings
+
     - name: Build
       run: |
-        cargo build
+        cargo build --workspace --all-targets --release
 
     - name: Run tests
       run: |
-        cargo test
+        cargo test --workspace --all-targets --release
+
+  tag:
+    runs-on: ubuntu-latest
+    needs: build_n_test
+    if: |
+      always() && github.event_name == 'push'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Create Git Tag
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        chmod +x ./ci/scripts/get-version.sh
+        version=$(./ci/scripts/get-version.sh)
+        echo "Creating git tag: v$version"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git tag "v$version"
+        git push origin "v$version"

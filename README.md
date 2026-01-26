@@ -1,6 +1,12 @@
 <!-- markdownlint-disable MD033 -->
 
-<h1 align="center">Rustgine</h1>
+<h1 align="center">Rustgine
+<br>
+<!-- Version Badge - do not edit manually -->
+<a href="https://crates.io/crates/rustgine">
+    <img src="https://img.shields.io/github/v/tag/diamondbo/rustgine?label=version" alt="Version">
+</a>
+</h1>
 
 <p align="center">
   <i>A modern, data-oriented game engine written in Rust.</i><br><br>
