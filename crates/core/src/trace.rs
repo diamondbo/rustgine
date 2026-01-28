@@ -1,4 +1,4 @@
-use tracing_subscriber::{EnvFilter, fmt};
+use tracing_subscriber::{fmt, EnvFilter};
 
 pub fn init_tracing(env: &str) {
     let default = match env {

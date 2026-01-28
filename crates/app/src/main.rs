@@ -2,9 +2,9 @@
 //!
 //! Initializes configuration, tracing, and runs the main event loop.
 
-use core::{Config, init_tracing};
+use app::resources::{run, AppState};
+use core::{init_tracing, Config};
 use tracing::info;
-use app::resources::{AppState, run};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
