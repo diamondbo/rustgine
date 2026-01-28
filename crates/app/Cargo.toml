@@ -5,10 +5,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0.100"
 core = { path = "../core" }
 ecs = { path = "../ecs" }
 math = { path = "../math" }
 platform = { path = "../platform" }
 render = { path = "../render" }
 scheduler = { path = "../scheduler" }
+tokio = { version = "1.49.0", features = ["rt", "rt-multi-thread", "signal", "sync", "macros"] }
+tracing = "0.1.44"
 winit = "0.30.12"
