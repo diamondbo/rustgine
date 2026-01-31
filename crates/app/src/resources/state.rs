@@ -10,6 +10,7 @@ pub struct AppState {
     pub config: Arc<Config>,
     /// Graceful shutdown signal broadcaster.
     pub shutdown: Shutdown,
+    pub rustgine_systems: Vec<Box<dyn core::RustgineSystem + Send + Sync>>,
 }
 
 impl AppState {
@@ -24,6 +25,11 @@ impl AppState {
         Ok(Arc::new(Self {
             config: Arc::new(config.clone()),
             shutdown: Shutdown::new(),
+            rustgine_systems: Vec::new(),
         }))
+    }
+
+    pub fn register_system<S: core::RustgineSystem + Send + Sync + 'static>(&mut self, system: S) {
+        self.rustgine_systems.push(Box::new(system));
     }
 }

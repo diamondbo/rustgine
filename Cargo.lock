@@ -232,6 +232,7 @@ name = "core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "tracing",
  "tracing-subscriber",
 ]
 
@@ -318,6 +319,7 @@ checksum = "d8b14ccef22fc6f5a8f4d7d768562a182c04ce9a3b3157b91390b52ddfdf1a76"
 name = "ecs"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "core",
 ]
 
@@ -908,6 +910,7 @@ checksum = "7edddbd0b52d732b21ad9a5fab5c704c14cd949e5e9a1ec5929a24fded1b904c"
 name = "platform"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "core",
 ]
 
@@ -1012,6 +1015,7 @@ checksum = "7a2d987857b319362043e95f5353c0535c1f58eec5336fdfcf626430af7def58"
 name = "render"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "core",
  "math",
 ]
@@ -1061,6 +1065,7 @@ dependencies = [
 name = "scheduler"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "core",
  "ecs",
 ]

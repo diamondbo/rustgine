@@ -7,3 +7,4 @@ edition = "2021"
 [dependencies]
 core = { path = "../core" }
 ecs = { path = "../ecs" }
+anyhow = "1.0.100"
