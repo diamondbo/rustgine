@@ -20,6 +20,7 @@ impl Shutdown {
     ///
     /// # Example
     /// ```
+    /// use app::resources::Shutdown;
     /// let shutdown = Shutdown::new();
     /// ```
     pub fn new() -> Self {

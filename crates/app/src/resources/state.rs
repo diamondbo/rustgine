@@ -1,5 +1,5 @@
 use crate::resources::Shutdown;
-use core::Config;
+use rustgine_core::Config;
 use std::sync::Arc;
 
 /// Global application state shared across tasks.
@@ -10,7 +10,7 @@ pub struct AppState {
     pub config: Arc<Config>,
     /// Graceful shutdown signal broadcaster.
     pub shutdown: Shutdown,
-    pub rustgine_systems: Vec<Box<dyn core::RustgineSystem + Send + Sync>>,
+    pub rustgine_systems: Vec<Box<dyn rustgine_core::RustgineSystem + Send + Sync>>,
 }
 
 impl AppState {
@@ -29,7 +29,7 @@ impl AppState {
         }))
     }
 
-    pub fn register_system<S: core::RustgineSystem + Send + Sync + 'static>(&mut self, system: S) {
+    pub fn register_system<S: rustgine_core::RustgineSystem + Send + Sync + 'static>(&mut self, system: S) {
         self.rustgine_systems.push(Box::new(system));
     }
 }

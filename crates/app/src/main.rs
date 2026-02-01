@@ -3,7 +3,7 @@
 //! Initializes configuration, tracing, and runs the main event loop.
 
 use app::resources::{run, AppState};
-use core::{init_tracing, Config};
+use rustgine_core::{init_tracing, Config};
 use tracing::info;
 
 #[tokio::main]

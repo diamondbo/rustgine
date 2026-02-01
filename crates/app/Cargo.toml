@@ -6,7 +6,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.100"
-core = { path = "../core" }
+rustgine_core = { path = "../core", package = "core" }
 ecs = { path = "../ecs" }
 math = { path = "../math" }
 platform = { path = "../platform" }

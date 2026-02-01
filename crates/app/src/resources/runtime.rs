@@ -1,5 +1,5 @@
 use crate::resources::AppState;
-use core::RustgineSystem;
+use rustgine_core::RustgineSystem;
 use platform::RustginePlatform;
 use render::RustgineRender;
 use scheduler::RustgineScheduler;
