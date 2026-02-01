@@ -3,7 +3,10 @@
 name = "ecs"
 version = "0.1.0"
 edition = "2021"
+description = "Entity Component System for Rustgine game engine"
+keywords = ["game-engine", "ecs", "entity-component-system"]
+categories = ["game-engines"]
 
 [dependencies]
 anyhow = "1.0.100"
-core = { path = "../core" }
+rustgine_core = { path = "../core", package = "core" }

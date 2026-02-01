@@ -3,7 +3,10 @@
 name = "platform"
 version = "0.1.0"
 edition = "2021"
+description = "Platform abstraction layer for Rustgine game engine"
+keywords = ["game-engine", "platform"]
+categories = ["game-engines"]
 
 [dependencies]
-core = { path = "../core" }
+rustgine_core = { path = "../core", package = "core" }
 anyhow = "1.0.100"

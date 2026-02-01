@@ -3,8 +3,11 @@
 name = "render"
 version = "0.1.0"
 edition = "2021"
+description = "Rendering subsystem for Rustgine game engine"
+keywords = ["game-engine", "rendering", "graphics"]
+categories = ["game-engines", "rendering"]
 
 [dependencies]
-core = { path = "../core" }
+rustgine_core = { path = "../core", package = "core" }
 math = { path = "../math" }
 anyhow = "1.0.100"
