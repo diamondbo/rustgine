@@ -37,7 +37,7 @@ async fn main() -> anyhow::Result<()> {
     );
 
     // Initialize application state and run
-    let state = AppState::initialize(&config).await?;
+    let state = AppState::initialize(&config)?;
     run(state).await?;
 
     info!(

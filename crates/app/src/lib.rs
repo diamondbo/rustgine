@@ -35,7 +35,7 @@
 //! #[tokio::main]
 //! async fn main() -> anyhow::Result<()> {
 //!     let config = Config::load()?;
-//!     let state = AppState::initialize(&config).await?;
+//!     let state = AppState::initialize(&config)?;
 //!     run(state).await?;
 //! }
 //! ```

@@ -80,8 +80,7 @@ impl Config {
     /// assert_eq!(config.environment, "development");
     /// ```
     pub fn load() -> anyhow::Result<Self> {
-        let environment = env::var(ENV_VAR_NAME)
-            .unwrap_or_else(|_| DEFAULT_ENVIRONMENT.to_owned());
+        let environment = env::var(ENV_VAR_NAME).unwrap_or_else(|_| DEFAULT_ENVIRONMENT.to_owned());
 
         let log_level = Self::log_level_for_environment(&environment);
 
@@ -95,8 +94,7 @@ impl Config {
     #[must_use]
     fn log_level_for_environment(env: &str) -> String {
         match env.to_ascii_lowercase().as_str() {
-            "production" | "prod" => "info",
-            "staging" => "info",
+            "production" | "prod" | "staging" => "info",
             _ => "debug",
         }
         .to_owned()

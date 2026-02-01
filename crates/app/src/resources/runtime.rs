@@ -42,7 +42,7 @@ use tracing::{info, warn};
 /// #[tokio::main]
 /// async fn main() -> anyhow::Result<()> {
 ///     let config = Config::load()?;
-///     let state = AppState::initialize(&config).await?;
+///     let state = AppState::initialize(&config)?;
 ///     run(state).await
 /// }
 /// ```
@@ -54,9 +54,9 @@ use tracing::{info, warn};
 /// - Any subsystem fails during shutdown
 pub async fn run(state: Arc<AppState>) -> anyhow::Result<()> {
     // Initialize subsystems in dependency order
-    let mut platform = RustginePlatform::default();
-    let mut render = RustgineRender::default();
-    let mut scheduler = RustgineScheduler::default();
+    let mut platform = RustginePlatform;
+    let mut render = RustgineRender;
+    let mut scheduler = RustgineScheduler;
 
     info!("starting platform subsystem");
     platform.startup()?;

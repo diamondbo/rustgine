@@ -36,13 +36,12 @@ use tracing_subscriber::{fmt, EnvFilter};
 pub fn init_tracing(env: &str) {
     let default_level = match env.to_ascii_lowercase().as_str() {
         "dev" | "development" => "debug",
-        "staging" => "info",
         "prod" | "production" => "warn",
         _ => "info",
     };
 
-    let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new(default_level));
+    let filter =
+        EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(default_level));
 
     fmt()
         .with_env_filter(filter)

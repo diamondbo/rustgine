@@ -34,7 +34,7 @@ use std::sync::Arc;
 /// use rustgine_core::Config;
 ///
 /// let config = Config::load()?;
-/// let state = AppState::initialize(&config).await?;
+/// let state = AppState::initialize(&config)?;
 /// ```
 #[derive(Debug)]
 pub struct AppState {
@@ -68,6 +68,11 @@ impl AppState {
     ///
     /// An `Arc<AppState>` ready for use, or an error if initialization fails.
     ///
+    /// # Errors
+    ///
+    /// Currently infallible, but returns `Result` to allow for future
+    /// initialization steps that may fail.
+    ///
     /// # Example
     ///
     /// ```ignore
@@ -75,9 +80,9 @@ impl AppState {
     /// use rustgine_core::Config;
     ///
     /// let config = Config::load()?;
-    /// let state = AppState::initialize(&config).await?;
+    /// let state = AppState::initialize(&config)?;
     /// ```
-    pub async fn initialize(config: &Config) -> anyhow::Result<Arc<Self>> {
+    pub fn initialize(config: &Config) -> anyhow::Result<Arc<Self>> {
         Ok(Arc::new(Self {
             config: Arc::new(config.clone()),
             shutdown: Shutdown::new(),

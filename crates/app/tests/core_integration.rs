@@ -1,6 +1,6 @@
-use rustgine_core::Config;
-use rustgine_core::init_tracing;
 use app::resources::Shutdown;
+use rustgine_core::init_tracing;
+use rustgine_core::Config;
 use tracing::info;
 
 #[test]
