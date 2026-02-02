@@ -9,7 +9,10 @@
 //! - `1` - Error during initialization or runtime
 
 use app::resources::{run, AppState};
+use platform::RustginePlatform;
+use render::RustgineRender;
 use rustgine_core::{init_tracing, Config};
+use scheduler::RustgineScheduler;
 use tracing::info;
 
 /// Application entry point.
@@ -38,8 +41,18 @@ async fn main() -> anyhow::Result<()> {
 
     // Initialize application state and run
     let state = AppState::initialize(&config)?;
-    run(state).await?;
 
+    // Initialize subsystems in dependency order
+    let platform = RustginePlatform;
+    let render = RustgineRender;
+    let scheduler = RustgineScheduler;
+
+    state.register_system("platform", platform)?;
+    state.register_system("render", render)?;
+    state.register_system("scheduler", scheduler)?;
+
+    // Run the main event loop
+    run(state).await?;
     info!(
         environment = %config.environment,
         service = "rustgine",

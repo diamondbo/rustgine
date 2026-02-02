@@ -4,12 +4,8 @@
 //! and handles graceful shutdown on OS signals.
 
 use crate::resources::AppState;
-use platform::RustginePlatform;
-use render::RustgineRender;
-use rustgine_core::RustgineSystem;
-use scheduler::RustgineScheduler;
 use std::sync::Arc;
-use tracing::{info, warn};
+use tracing::{debug, warn};
 
 /// Runs the main application event loop.
 ///
@@ -53,21 +49,26 @@ use tracing::{info, warn};
 /// - Any subsystem fails during startup
 /// - Any subsystem fails during shutdown
 pub async fn run(state: Arc<AppState>) -> anyhow::Result<()> {
-    // Initialize subsystems in dependency order
-    let mut platform = RustginePlatform;
-    let mut render = RustgineRender;
-    let mut scheduler = RustgineScheduler;
+    {
+        let mut systems = state
+            .rustgine_systems
+            .lock()
+            .map_err(|_| anyhow::anyhow!("rustgine systems lock poisoned"))?;
 
-    info!("starting platform subsystem");
-    platform.startup()?;
-
-    info!("starting render subsystem");
-    render.startup()?;
-
-    info!("starting scheduler subsystem");
-    scheduler.startup()?;
-
-    info!("all subsystems initialized, entering main loop");
+        for system in systems.iter_mut() {
+            if !system.enabled {
+                debug!(system = %system.name, "subsystem disabled, skipping startup");
+                continue;
+            }
+            debug!(system = %system.name, "starting subsystem");
+            if let Err(e) = system.system.startup() {
+                warn!(system = %system.name, error = %e, "failed to start subsystem");
+                return Err(e);
+            }
+            debug!(system = %system.name, "subsystem started");
+        }
+    }
+    debug!(systems = ?state.system_count(), "all subsystems initialized, entering main loop");
 
     // Subscribe to shutdown signal for coordinated termination
     let mut shutdown_rx = state.shutdown.subscribe();
@@ -77,31 +78,38 @@ pub async fn run(state: Arc<AppState>) -> anyhow::Result<()> {
     tokio::select! {
         result = tokio::signal::ctrl_c() => {
             match result {
-                Ok(()) => info!("received Ctrl+C, initiating shutdown"),
+                Ok(()) => debug!("received Ctrl+C, initiating shutdown"),
                 Err(e) => warn!(error = %e, "failed to listen for Ctrl+C signal"),
             }
             state.shutdown.trigger();
         }
         () = &mut shutdown_fut => {
-            info!("internal shutdown signal received");
+            // Internal shutdown already triggered elsewhere; no need to re-trigger here.
+            debug!("internal shutdown signal received");
         }
     }
 
-    info!("shutting down subsystems");
+    debug!("shutting down subsystems");
 
     // Shutdown in reverse dependency order
-    if let Err(e) = scheduler.shutdown() {
-        warn!(error = %e, "scheduler shutdown error");
+    let mut systems = state
+        .rustgine_systems
+        .lock()
+        .map_err(|_| anyhow::anyhow!("rustgine systems lock poisoned"))?;
+
+    for system in systems.iter_mut().rev() {
+        if !system.enabled {
+            debug!(system = %system.name, "subsystem disabled, skipping shutdown");
+            continue;
+        }
+        debug!(system = %system.name, "shutting down subsystem");
+        if let Err(e) = system.system.shutdown() {
+            warn!(system = %system.name, error = %e, "failed to shut down subsystem");
+            return Err(e);
+        }
+        debug!(system = %system.name, "subsystem shut down");
     }
 
-    if let Err(e) = render.shutdown() {
-        warn!(error = %e, "render shutdown error");
-    }
-
-    if let Err(e) = platform.shutdown() {
-        warn!(error = %e, "platform shutdown error");
-    }
-
-    info!("all subsystems shut down");
+    debug!("all subsystems shut down");
     Ok(())
 }

@@ -5,7 +5,7 @@
 
 use crate::resources::Shutdown;
 use rustgine_core::{Config, RustgineSystem};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 /// Global application state shared across all engine tasks.
 ///
@@ -17,8 +17,8 @@ use std::sync::Arc;
 /// # Thread Safety
 ///
 /// `AppState` is designed to be wrapped in [`Arc`] and shared across
-/// async tasks. Individual fields provide their own synchronization
-/// where necessary.
+/// async tasks. Subsystem registration and access are synchronized
+/// internally to allow registration without exclusive access.
 ///
 /// # Lifecycle
 ///
@@ -52,7 +52,22 @@ pub struct AppState {
     ///
     /// Systems are stored as trait objects to allow heterogeneous collections.
     /// They are started in registration order and shut down in reverse order.
-    rustgine_systems: Vec<Box<dyn RustgineSystem + Send + Sync>>,
+    ///
+    /// A mutex provides interior mutability so subsystems can be registered
+    /// without requiring a mutable reference to `AppState`.
+    // rustgine_systems: Vec<Box<dyn RustgineSystem + Send + Sync>>,
+    pub rustgine_systems: Mutex<Vec<NamedSystem>>,
+}
+
+/// Named wrapper for engine subsystems.
+///
+/// Associates a human-readable name with each subsystem for logging
+/// and management purposes.
+#[derive(Debug)]
+pub struct NamedSystem {
+    pub name: String,
+    pub enabled: bool,
+    pub system: Box<dyn RustgineSystem + Send + Sync>,
 }
 
 impl AppState {
@@ -86,7 +101,7 @@ impl AppState {
         Ok(Arc::new(Self {
             config: Arc::new(config.clone()),
             shutdown: Shutdown::new(),
-            rustgine_systems: Vec::new(),
+            rustgine_systems: Mutex::new(Vec::new()),
         }))
     }
 
@@ -108,20 +123,39 @@ impl AppState {
     /// ```ignore
     /// use platform::RustginePlatform;
     ///
-    /// // Note: requires mutable access, typically before Arc wrapping
-    /// state.register_system(RustginePlatform::default());
+    /// state.register_system("platform", RustginePlatform::default())?;
     /// ```
-    pub fn register_system<S>(&mut self, system: S)
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the subsystem registry lock is poisoned.
+    pub fn register_system<S>(&self, alias: &str, system: S) -> anyhow::Result<()>
     where
         S: RustgineSystem + Send + Sync + 'static,
     {
-        self.rustgine_systems.push(Box::new(system));
+        let mut systems = self
+            .rustgine_systems
+            .lock()
+            .map_err(|_| anyhow::anyhow!("rustgine systems lock poisoned"))?;
+
+        systems.push(NamedSystem {
+            name: alias.to_string(),
+            enabled: true,
+            system: Box::new(system),
+        });
+
+        Ok(())
     }
 
     /// Returns the number of registered subsystems.
+    ///
+    /// Returns `0` if the subsystem registry lock is poisoned.
     #[must_use]
     #[inline]
     pub fn system_count(&self) -> usize {
-        self.rustgine_systems.len()
+        self.rustgine_systems
+            .lock()
+            .map(|systems| systems.len())
+            .unwrap_or(0)
     }
 }
