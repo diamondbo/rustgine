@@ -27,8 +27,7 @@ static INIT_TRACING: Once = Once::new();
 /// init_tracing("info");
 /// ```
 pub fn init_tracing(log_level: &str) {
-    let filter =
-        EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(log_level));
+    let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(log_level));
 
     INIT_TRACING.call_once(|| {
         fmt()

@@ -12,6 +12,6 @@ math = { path = "../math" }
 platform = { path = "../platform" }
 render = { path = "../render" }
 scheduler = { path = "../scheduler" }
-tokio = { version = "1.49.0", features = ["rt", "rt-multi-thread", "signal", "sync", "macros"] }
+tokio = { version = "1.49.0", features = ["rt", "rt-multi-thread", "signal", "sync", "macros", "time"] }
 tracing = "0.1.44"
 winit = "0.30.12"
