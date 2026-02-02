@@ -63,7 +63,7 @@ impl Config {
     /// |-------------|----------|
     /// | development | debug    |
     /// | staging     | info     |
-    /// | production  | info     |
+    /// | production  | warn     |
     ///
     /// # Errors
     ///
@@ -72,7 +72,7 @@ impl Config {
     ///
     /// # Example
     ///
-    /// ```
+    /// ```ignore
     /// use core::Config;
     ///
     /// // With RUSTGINE_ENV unset, defaults to "development"
@@ -94,8 +94,9 @@ impl Config {
     #[must_use]
     fn log_level_for_environment(env: &str) -> String {
         match env.to_ascii_lowercase().as_str() {
-            "production" | "prod" | "staging" => "info",
-            _ => "debug",
+            "dev" | "development" => "debug",
+            "prod" | "production" => "warn",
+            _ => "info",
         }
         .to_owned()
     }

@@ -30,7 +30,7 @@ async fn main() -> anyhow::Result<()> {
     let config = Config::load()?;
 
     // Initialize tracing with environment-appropriate defaults
-    init_tracing(&config.environment);
+    init_tracing(&config.log_level);
 
     info!(
         environment = %config.environment,
