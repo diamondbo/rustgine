@@ -6,11 +6,11 @@ rustgine is designed for performance, safety, and modularity. Its architecture i
 
 ```mermaid
 flowchart TD
-    A[Platform] --> B[Application / Loop app]
-    B --> C[Core]
-    C --> D[ECS World + Scheduler]
-    D --> E[Systems: Physics, Gameplay, AI, Render Prep]
-    E --> F[Renderer wgpu + Frame Graph]
+    B[Platform] --> A[Application / Loop app]
+    C[Core] --> A
+    D[ECS World + Scheduler] --> A
+    E[Systems: Physics, Gameplay, AI, Render Prep] --> A
+    F[Renderer wgpu + Frame Graph] --> A
 ```
 
 - **CPU simulation is parallelized** using a dependency-aware scheduler.
@@ -19,15 +19,15 @@ flowchart TD
 
 ## Crate Responsibilities
 
-| Crate      | Responsibility                                 |
-|------------|------------------------------------------------|
-| core       | Glue, shared abstractions, engine state        |
-| ecs        | World, entities, archetypes, queries           |
-| scheduler  | System access analysis & parallel execution    |
-| render     | GPU context, render graph, frame submission    |
-| platform   | OS interaction, windowing, input               |
-| math       | Math primitives                                |
-| app        | Owns the main loop & execution policy          |
+| Crate      | Responsibility                                              |
+|------------|-------------------------------------------------------------|
+| core       | Config, tracing, `RustgineSystem` trait, shared abstractions|
+| ecs        | World, entities, archetypes, queries                        |
+| scheduler  | System access analysis & parallel execution                 |
+| render     | GPU context, render graph, frame submission                 |
+| platform   | OS interaction, windowing, input                            |
+| math       | Math primitives                                             |
+| app        | Main loop, subsystem lifecycle, graceful shutdown           |
 
 ## Core Design Principles
 
@@ -38,23 +38,53 @@ flowchart TD
 
 ## The Engine Loop
 
-The main loop is in the `app` crate. Example frame flow:
+The main loop lives in the `app` crate and orchestrates the full engine lifecycle:
 
 ```bash
-Frame Start
- ├── Poll OS Events
- ├── Update Time
- ├── Run Simulation Systems (parallel)
- ├── Extract Render Data (parallel)
- ├── Submit GPU Commands
- └── Present Frame
+Engine Lifecycle
+ ├── Load Config
+ ├── Initialize Tracing
+ ├── Create AppState (config, shutdown signal, subsystem registry)
+ ├── Register Subsystems (platform, render, scheduler, ...)
+ ├── Startup Subsystems (in registration order)
+ ├── Main Loop (wait for shutdown signal)
+ │    └── Ctrl+C or internal trigger
+ ├── Shutdown Subsystems (in reverse order)
+ └── Exit
 ```
+
+### Subsystem Lifecycle
+
+Subsystems implement the `RustgineSystem` trait defined in `core`:
+
+```rust
+pub trait RustgineSystem: Debug {
+    fn startup(&mut self) -> anyhow::Result<()>;
+    fn shutdown(&mut self) -> anyhow::Result<()>;
+}
+```
+
+Subsystems are registered via `AppState::register_system()` and managed with interior mutability (`Mutex`) to allow registration after `Arc` wrapping. Startup proceeds in registration order; shutdown proceeds in reverse order for correct dependency teardown.
+
+### Graceful Shutdown
+
+The `Shutdown` broadcaster coordinates termination across async tasks:
+
+- **Ctrl+C (SIGINT)**: OS signal triggers shutdown
+- **Internal trigger**: Any task can call `shutdown.trigger()`
+- **Subscribers**: Tasks subscribe via `shutdown.subscribe()` to receive the signal
 
 This design enables headless simulation, deterministic testing, and server/editor builds.
 
 ## Systems & Scheduling
 
-Systems are defined as:
+### Engine Subsystems (`RustgineSystem`)
+
+Long-lived subsystems (platform, render, scheduler) implement `RustgineSystem` for lifecycle management. They are started once at engine init and shut down at termination.
+
+### Frame Systems (ECS)
+
+Per-frame gameplay systems will be defined as:
 
 ```rust
 trait System {
@@ -63,7 +93,7 @@ trait System {
 }
 ```
 
-The scheduler builds a conflict graph, finds independent sets, and runs systems in parallel without locks.
+The scheduler builds a conflict graph, finds independent sets, and runs independent systems in parallel without locks.
 
 ## Rendering Philosophy
 

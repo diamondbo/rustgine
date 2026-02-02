@@ -5,10 +5,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-core = { path = "../core" }
+anyhow = "1.0.100"
+rustgine_core = { path = "../core", package = "core" }
 ecs = { path = "../ecs" }
 math = { path = "../math" }
 platform = { path = "../platform" }
 render = { path = "../render" }
 scheduler = { path = "../scheduler" }
+tokio = { version = "1.49.0", features = ["rt", "rt-multi-thread", "signal", "sync", "macros", "time"] }
+tracing = "0.1.44"
 winit = "0.30.12"

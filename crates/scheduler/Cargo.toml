@@ -3,7 +3,11 @@
 name = "scheduler"
 version = "0.1.0"
 edition = "2021"
+description = "Task scheduling subsystem for Rustgine game engine"
+keywords = ["game-engine", "scheduler", "tasks"]
+categories = ["game-engines", "concurrency"]
 
 [dependencies]
-core = { path = "../core" }
+rustgine_core = { path = "../core", package = "core" }
 ecs = { path = "../ecs" }
+anyhow = "1.0.100"

@@ -5,6 +5,23 @@ All notable changes to Identra will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-01-29
+
+### Added
+
+- Initial `app` crate with async main entry point using Tokio
+- Configuration loading via new `core::Config` struct (env-based)
+- Structured logging and tracing initialization based on environment
+- Graceful shutdown handling using broadcast signal pattern
+- Modular resource organization: state, runtime, shutdown
+- Re-exports and documentation improvements in `core`
+- Dependency updates: `anyhow`, `tokio`, `tracing`, `tracing-subscriber`
+
+### Changed
+
+- Workspace version bumped to 0.3.0
+- Improved code comments and docstrings for public APIs
+
 ## [0.2.0] - 2026-01-25
 
 ### Added
